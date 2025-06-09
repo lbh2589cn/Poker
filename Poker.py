@@ -1,4 +1,4 @@
-'''修复了当玩家反复犯“出自己没有的牌”和“出不能大过前一玩家出的牌”的错误时，可能导致未判断出的bug。'''
+'''当玩家弃权时，无需再输入“-1”，只需直接按“Enter”键。'''
 from random import randint
 #判断能否找到：
 def found(cards,player,A,B,C,D):
@@ -134,8 +134,8 @@ def shuangkou_end(A,B,C,D):
         if len(B)==0 or len(A)==len(C)==0:
             return True
     return False
-cards=[];end=0
-while end!=-1:
+cards=[];end='not end'
+while end!='':
     game_type=int(input('选择类型（输入半角数字）：1、双人；2、斗地主（三人）；3、双扣（四人）：'))
     if game_type==1:
 #定义所有的牌：
@@ -203,22 +203,22 @@ while end!=-1:
         player=1
         start=False
         while len(A)>0 and len(B)>0:
-            cur=input(players[player]+'方出牌（弃权输入-1）：')
-            if cur=='-1':
+            cur=input(players[player]+'方出牌（弃权直接按“Enter”键）：')
+            if cur=='':
                 player=1-player
                 start=True
                 continue
-            while (cur!='-1' and not found(cur,player,A,B,'','')) or (start and not judge_start(cur)) or (cur!='-1' and not judge(pre,cur) and not start):
-                while cur!='-1' and not found(cur,player,A,B,'',''):
+            while (cur!='' and not found(cur,player,A,B,'','')) or (start and not judge_start(cur)) or (cur!='' and not judge(pre,cur) and not start):
+                while cur!='' and not found(cur,player,A,B,'',''):
                     print('所出牌中含有不存在的。')
-                    cur=input(players[player]+'方出牌（弃权输入-1）：')
+                    cur=input(players[player]+'方出牌（弃权直接按“Enter”键）：')
                 while start and not judge_start(cur):
                     print('无效。')
-                    cur=input(players[player]+'方出牌（弃权输入-1）：')
-                while cur!='-1' and not judge(pre,cur) and not start:
+                    cur=input(players[player]+'方出牌（弃权直接按“Enter”键）：')
+                while cur!='' and not judge(pre,cur) and not start:
                     print('无效。')
-                    cur=input(players[player]+'方出牌（弃权输入-1）：')
-            if cur=='-1':
+                    cur=input(players[player]+'方出牌（弃权直接按“Enter”键）：')
+            if cur=='':
                 player=1-player
                 start=True
                 continue
@@ -272,30 +272,9 @@ while end!=-1:
             if not c in indexA and not c in indexB and not c in reserved:
                 indexC+=[c]
 #将牌的索引按从小到大的顺序排序：
-        for i in range(len(indexA)-1,0,-1):
-            in_order=True
-            for j in range(i):
-                if indexA[j]>indexA[j+1]:
-                    indexA[j],indexA[j+1]=indexA[j+1],indexA[j]
-                    in_order=False
-            if in_order:
-                break
-        for i in range(len(indexB)-1,0,-1):
-            in_order=True
-            for j in range(i):
-                if indexB[j]>indexB[j+1]:
-                    indexB[j],indexB[j+1]=indexB[j+1],indexB[j]
-                    in_order=False
-            if in_order:
-                break
-        for i in range(len(indexC)-1,0,-1):
-            in_order=True
-            for j in range(i):
-                if indexC[j]>indexC[j+1]:
-                    indexC[j],indexC[j+1]=indexC[j+1],indexC[j]
-                    in_order=False
-            if in_order:
-                break
+        indexA.sort()
+        indexB.sort()
+        indexC.sort()
         print('“10”用“T”代替，“小王”用“S”代替，“大王”用“B”代替。')
         print('请使用半角数字或半角大写英文字母输入所出的牌。')
 #将索引与牌对应：
@@ -319,7 +298,7 @@ while end!=-1:
         for card in reserved:
             print(cards[card],end=' ')
         lord=int(input('地主（输入半角数字，1代表甲，2代表乙，3代表丙）：'))-1
-        while not (lord==1 or lord==2 or lord==3):
+        while not (lord==0 or lord==1 or lord==2):
             lord=int(input('输入错误。地主（输入半角数字，1代表甲，2代表乙，3代表丙）：'))-1
 #由于添加预留牌的一方需将索引重新排序，原来的牌需清空（但索引无需清空）；
 #否则将索引排序后对应添加牌时会导致其原有的牌被重复添加：
@@ -327,15 +306,8 @@ while end!=-1:
             A=''
             for card in reserved:
                 indexA.append(card)
-            for i in range(len(indexA)-1,0,-1):
-                in_order=True
-                for j in range(i):
-                    if indexA[j]>indexA[j+1]:
-                        indexA[j],indexA[j+1]=indexA[j+1],indexA[j]
-                        in_order=False
-                if in_order:
-                    break
-            print('甲方牌：')
+            indexA.sort()
+            print('甲方牌：',end='')
             for a in indexA:
                 A+=cards[a]
                 print(cards[a],end=',')
@@ -344,15 +316,8 @@ while end!=-1:
             B=''
             for card in reserved:
                 indexB.append(card)
-            for i in range(len(indexB)-1,0,-1):
-                in_order=True
-                for j in range(i):
-                    if indexB[j]>indexB[j+1]:
-                        indexB[j],indexB[j+1]=indexB[j+1],indexB[j]
-                        in_order=False
-                if in_order:
-                    break
-            print('乙方牌：')
+            indexB.sort()
+            print('乙方牌：',end='')
             for b in indexB:
                 B+=cards[b]
                 print(cards[b],end=',')
@@ -361,15 +326,8 @@ while end!=-1:
             C=''
             for card in reserved:
                 indexC.append(card)
-            for i in range(len(indexC)-1,0,-1):
-                in_order=True
-                for j in range(i):
-                    if indexC[j]>indexC[j+1]:
-                        indexC[j],indexC[j+1]=indexC[j+1],indexC[j]
-                        in_order=False
-                if in_order:
-                    break
-            print('丙方牌：')
+            indexC.sort()
+            print('丙方牌：',end='')
             for c in indexC:
                 C+=cards[c]
                 print(cards[c],end=',')
@@ -393,20 +351,20 @@ while end!=-1:
         empty=0
         start=False
         while len(A)>0 and len(B)>0 and len(C)>0:
-            cur=input(players[player]+'方出牌（弃权输入-1）：')
+            cur=input(players[player]+'方出牌（弃权直接按“Enter”键）：')
             if empty==2:
                 start=True
-            while (cur!='-1' and not found(cur,player,A,B,C,'')) or (cur!='-1' and start and not judge_start(cur)) or (cur!='-1' and not start and not judge(pre,cur)):
-                while cur!='-1' and not found(cur,player,A,B,C,''):
+            while (cur!='' and not found(cur,player,A,B,C,'')) or (cur!='' and start and not judge_start(cur)) or (cur!='' and not start and not judge(pre,cur)):
+                while cur!='' and not found(cur,player,A,B,C,''):
                     print('所出牌中含有不存在的。')
-                    cur=input(players[player]+'方出牌（弃权输入-1）：')
-                while cur!='-1' and start and not judge_start(cur):
+                    cur=input(players[player]+'方出牌（弃权直接按“Enter”键）：')
+                while cur!='' and start and not judge_start(cur):
                     print('无效。')
-                    cur=input(players[player]+'方出牌（弃权输入-1）：')
-                while cur!='-1' and not start and not judge(pre,cur):
+                    cur=input(players[player]+'方出牌（弃权直接按“Enter”键）：')
+                while cur!='' and not start and not judge(pre,cur):
                     print('无效。')
-                    cur=input(players[player]+'方出牌（弃权输入-1）：')
-            if cur=='-1':
+                    cur=input(players[player]+'方出牌（弃权直接按“Enter”键）：')
+            if cur=='':
                 empty+=1
                 player=(player+1)%3
                 continue
@@ -553,7 +511,7 @@ while end!=-1:
         need=0
         start=False
         while not shuangkou_end(A,B,C,D):
-            cur=input(players[player]+'方出牌（弃权输入-1）：')
+            cur=input(players[player]+'方出牌（弃权直接按“Enter”键）：')
             remaining=[len(A),len(B),len(C),len(D)]
 #如果当前玩家已出完牌：
             while remaining[player]==0:
@@ -564,17 +522,17 @@ while end!=-1:
                     need+=1
             if empty==need-1:
                 start=True
-            while (cur!='-1' and not found(cur,player,A,B,C,D)) or (cur!='-1' and start and not judge_start(cur)) or (cur!='-1' and not start and not judge(pre,cur)):
-                while cur!='-1' and not found(cur,player,A,B,C,D):
+            while (cur!='' and not found(cur,player,A,B,C,D)) or (cur!='' and start and not judge_start(cur)) or (cur!='' and not start and not judge(pre,cur)):
+                while cur!='' and not found(cur,player,A,B,C,D):
                     print('所出牌中含有不存在的。')
-                    cur=input(players[player]+'方出牌（弃权输入-1）：')
-                while cur!='-1' and start and not judge_start(cur):
+                    cur=input(players[player]+'方出牌（弃权直接按“Enter”键）：')
+                while cur!='' and start and not judge_start(cur):
                     print('无效。')
-                    cur=input(players[player]+'方出牌（弃权输入-1）：')
-                while cur!='-1' and not start and not judge(pre,cur):
+                    cur=input(players[player]+'方出牌（弃权直接按“Enter”键）：')
+                while cur!='' and not start and not judge(pre,cur):
                     print('无效。')
-                    cur=input(players[player]+'方出牌（弃权输入-1）：')
-            if cur=='-1':
+                    cur=input(players[player]+'方出牌（弃权直接按“Enter”键）：')
+            if cur=='':
                 empty+=1
                 player=(player+1)%4
                 need=0
@@ -609,4 +567,4 @@ while end!=-1:
             print('甲、丙胜。')
         else:
             print('乙、丁胜。')
-    end=int(input('输入半角数字“-1”以结束，输入任意其它字符以重新开始：'))
+    end=input('直接按“Enter”键以结束，输入任意其它字符以重新开始：')
