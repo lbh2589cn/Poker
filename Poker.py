@@ -1,4 +1,4 @@
-'''扑克牌程序自2022年8月开始着手编写，历经2个月，现已初步完成；但仍存在一些bug，待将来修复。'''
+'''修复了当玩家反复犯“出自己没有的牌”和“出不能大过前一玩家出的牌”的错误时，可能导致未判断出的bug。'''
 from random import randint
 #判断能否找到：
 def found(cards,player,A,B,C,D):
@@ -208,15 +208,16 @@ while end!=-1:
                 player=1-player
                 start=True
                 continue
-            while not found(cur,player,A,B,'','') and cur!='-1':
-                print('所出牌中含有不存在的。')
-                cur=input(players[player]+'方出牌（弃权输入-1）：')
-            while start and not judge_start(cur):
-                print('无效。')
-                cur=input(players[player]+'方出牌（弃权输入-1）：')
-            while not start and not judge(pre,cur) and cur!='-1':
-                print('无效。')
-                cur=input(players[player]+'方出牌（弃权输入-1）：')
+            while (cur!='-1' and not found(cur,player,A,B,'','')) or (start and not judge_start(cur)) or (cur!='-1' and not judge(pre,cur) and not start):
+                while cur!='-1' and not found(cur,player,A,B,'',''):
+                    print('所出牌中含有不存在的。')
+                    cur=input(players[player]+'方出牌（弃权输入-1）：')
+                while start and not judge_start(cur):
+                    print('无效。')
+                    cur=input(players[player]+'方出牌（弃权输入-1）：')
+                while cur!='-1' and not judge(pre,cur) and not start:
+                    print('无效。')
+                    cur=input(players[player]+'方出牌（弃权输入-1）：')
             if cur=='-1':
                 player=1-player
                 start=True
@@ -317,9 +318,9 @@ while end!=-1:
         print('预留牌：',end='')
         for card in reserved:
             print(cards[card],end=' ')
-        lord=int(input('地主（输入半角数字，0代表甲，1代表乙，2代表丙）：'))
-        while not (lord==0 or lord==1 or lord==2):
-            lord=int(input('输入错误。地主（输入半角数字，0代表甲，1代表乙，2代表丙）：'))
+        lord=int(input('地主（输入半角数字，1代表甲，2代表乙，3代表丙）：'))-1
+        while not (lord==1 or lord==2 or lord==3):
+            lord=int(input('输入错误。地主（输入半角数字，1代表甲，2代表乙，3代表丙）：'))-1
 #由于添加预留牌的一方需将索引重新排序，原来的牌需清空（但索引无需清空）；
 #否则将索引排序后对应添加牌时会导致其原有的牌被重复添加：
         if lord==0:
@@ -395,15 +396,16 @@ while end!=-1:
             cur=input(players[player]+'方出牌（弃权输入-1）：')
             if empty==2:
                 start=True
-            while cur!='-1' and not found(cur,player,A,B,C,''):
-                print('所出牌中含有不存在的。')
-                cur=input(players[player]+'方出牌（弃权输入-1）：')
-            while cur!='-1' and start and not judge_start(cur):
-                print('无效。')
-                cur=input(players[player]+'方出牌（弃权输入-1）：')
-            while cur!='-1' and not start and not judge(pre,cur):
-                print('无效。')
-                cur=input(players[player]+'方出牌（弃权输入-1）：')
+            while (cur!='-1' and not found(cur,player,A,B,C,'')) or (cur!='-1' and start and not judge_start(cur)) or (cur!='-1' and not start and not judge(pre,cur)):
+                while cur!='-1' and not found(cur,player,A,B,C,''):
+                    print('所出牌中含有不存在的。')
+                    cur=input(players[player]+'方出牌（弃权输入-1）：')
+                while cur!='-1' and start and not judge_start(cur):
+                    print('无效。')
+                    cur=input(players[player]+'方出牌（弃权输入-1）：')
+                while cur!='-1' and not start and not judge(pre,cur):
+                    print('无效。')
+                    cur=input(players[player]+'方出牌（弃权输入-1）：')
             if cur=='-1':
                 empty+=1
                 player=(player+1)%3
@@ -562,15 +564,16 @@ while end!=-1:
                     need+=1
             if empty==need-1:
                 start=True
-            while cur!='-1' and not found(cur,player,A,B,C,D):
-                print('所出牌中含有不存在的。')
-                cur=input(players[player]+'方出牌（弃权输入-1）：')
-            while cur!='-1' and start and not judge_start(cur):
-                print('无效。')
-                cur=input(players[player]+'方出牌（弃权输入-1）：')
-            while cur!='-1' and not start and not judge(pre,cur):
-                print('无效。')
-                cur=input(players[player]+'方出牌（弃权输入-1）：')
+            while (cur!='-1' and not found(cur,player,A,B,C,D)) or (cur!='-1' and start and not judge_start(cur)) or (cur!='-1' and not start and not judge(pre,cur)):
+                while cur!='-1' and not found(cur,player,A,B,C,D):
+                    print('所出牌中含有不存在的。')
+                    cur=input(players[player]+'方出牌（弃权输入-1）：')
+                while cur!='-1' and start and not judge_start(cur):
+                    print('无效。')
+                    cur=input(players[player]+'方出牌（弃权输入-1）：')
+                while cur!='-1' and not start and not judge(pre,cur):
+                    print('无效。')
+                    cur=input(players[player]+'方出牌（弃权输入-1）：')
             if cur=='-1':
                 empty+=1
                 player=(player+1)%4
