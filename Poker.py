@@ -1,4 +1,4 @@
-'''当玩家出完牌，系统会清屏，以防下一玩家看到上一玩家的牌。（部分CLI可能不适用。）'''
+'''加入了三带一、三带二的判断。'''
 
 from random import randint
 from os import system
@@ -80,6 +80,19 @@ def double_shunzi(cards):
             return False
         return True
 
+#判断三带一、三带二：
+def san_dai_yi(cards):
+    order='3456789TJQKA2'
+    if len(cards)==4 and same(cards[0:3]):
+        return True
+    return False
+
+def san_dai_er(cards):
+    order='3456789TJQKA2'
+    if len(cards)==5 and same(cards[0:3]):
+        return True
+    return False
+
 #判断炸弹：
 def bomb(pre,cur):
     order='3456789TJQKA2SB'
@@ -96,6 +109,8 @@ def judge_start(cards):
     elif (len(cards)==2 or len(cards)==3) and same(cards):
         return True
     elif single_shunzi(cards) or double_shunzi(cards):
+        return True
+    elif san_dai_yi(cards) or san_dai_er(cards):
         return True
     elif len(cards)>=4 and same(cards):
         return True
@@ -128,6 +143,18 @@ def judge(pre,cur):
     elif double_shunzi(pre):
         if len(pre)==len(cur) and double_shunzi(cur) and order.find(cur[0])>order.find(pre[0]):
             return True
+    if san_dai_yi(pre):
+        if san_dai_yi(cur):
+            if order.find(pre[0])<order.find(cur[0]):
+                return True
+            elif order.find(pre[0])==order.find(cur[0]) and order.find(pre[3])<order.find(cur[3]):
+                return True
+    elif san_dai_er(pre):
+        if san_dai_er(cur):
+            if order.find(pre[0])<order.find(cur[0]):
+                return True
+            elif order.find(pre[0])==order.find(cur[0]) and order.find(pre[3])<order.find(cur[3]):
+                return True
     return False
 
 #双扣的结束条件：
