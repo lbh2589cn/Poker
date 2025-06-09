@@ -1,4 +1,4 @@
-'''加入了三带一、三带二的判断。'''
+'''完善了三带一、三带二与炸弹等之间关系的判断。'''
 
 from random import randint
 from os import system
@@ -93,10 +93,12 @@ def san_dai_er(cards):
         return True
     return False
 
-#判断炸弹：
+#判断是否可以出炸弹：
 def bomb(pre,cur):
     order='3456789TJQKA2SB'
-    if len(pre)<len(cur) or single_shunzi(pre) or double_shunzi(pre):
+    if san_dai_yi(pre) or san_dai_er(pre):
+        return True
+    elif len(pre)<len(cur) or single_shunzi(pre) or double_shunzi(pre):
         return True
     elif len(pre)==len(cur) and order.find(pre)<order.find(cur):
         return True
